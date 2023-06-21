@@ -1,6 +1,6 @@
 package persistence
 
-const schema = `
+const Schema = `
 	CREATE TABLE IF NOT EXISTS student (
 		id SERIAL PRIMARY KEY,
 		first_name varchar,

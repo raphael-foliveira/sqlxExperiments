@@ -2,15 +2,21 @@ package persistence
 
 import (
 	"database/sql"
-	"os"
 
 	"github.com/jmoiron/sqlx"
 
 	_ "github.com/lib/pq"
 )
 
-func InitDb() (*sqlx.Tx, error) {
-	db, err := connectDb()
+type DbCredentials struct {
+	Host     string
+	User     string
+	Password string
+	DbName   string
+}
+
+func InitDb(c *DbCredentials) (*sqlx.Tx, error) {
+	db, err := connectDb(c)
 	if err != nil {
 		return nil, err
 	}
@@ -19,19 +25,18 @@ func InitDb() (*sqlx.Tx, error) {
 		return nil, err
 	}
 	return db.Beginx()
-
 }
 
-func connectDb() (*sqlx.DB, error) {
+func connectDb(c *DbCredentials) (*sqlx.DB, error) {
 	return sqlx.Connect(
 		"postgres",
-		"host=localhost"+
-			" user="+os.Getenv("POSTGRES_USER")+
-			" password="+os.Getenv("POSTGRES_PASSWORD")+
-			" dbname="+os.Getenv("POSTGRES_DB")+
+		"host="+c.Host+
+			" user="+c.User+
+			" password="+c.Password+
+			" dbname="+c.DbName+
 			" sslmode=disable")
 }
 
 func migrateSchema(db *sqlx.DB) (sql.Result, error) {
-	return db.Exec(schema)
+	return db.Exec(Schema)
 }
